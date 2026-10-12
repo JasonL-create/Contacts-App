@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1428"><meta name="color-scheme" content="dark"><meta name="apple-mobile-web-app-title" content="Contacts"><link rel="manifest" href="manifest.webmanifest?v=19"><link rel="apple-touch-icon" href="icon-180.png?v=19"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="apple-touch-startup-image" href="splash-1170.png?v=19" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"><link rel="apple-touch-startup-image" href="splash-1290.png?v=19" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"><title>Contacts</title><script>try{if(JSON.parse(localStorage.getItem('simple-contacts-v1')||'{}').theme==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script><style>html,body,#app{background:#0b1428!important}html,body{margin:0;height:100%;width:100%;overflow:hidden}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1428"><meta name="color-scheme" content="dark"><meta name="apple-mobile-web-app-title" content="Contacts"><link rel="manifest" href="manifest.webmanifest?v=20"><link rel="apple-touch-icon" href="icon-180.png?v=20"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="apple-touch-startup-image" href="splash-1170.png?v=19" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"><link rel="apple-touch-startup-image" href="splash-1290.png?v=19" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"><title>Contacts</title><script>try{if(JSON.parse(localStorage.getItem('simple-contacts-v1')||'{}').theme==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script><style>html,body,#app{background:#0b1428!important}html,body{margin:0;height:100%;width:100%;overflow:hidden}
 /* Paint the launch surface before the app stylesheet is parsed. */
 html,body{background-color:#080f1e!important}
 
@@ -163,8 +163,68 @@ document.addEventListener('gesturechange',event=>event.preventDefault(),{passive
 const icons={search:'<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/>',star:'<path d="m12 2 3.2 6.6 7.3 1.1-5.3 5.1 1.3 7.2L12 18.6 5.5 22l1.3-7.2-5.3-5.1 7.3-1.1z"/>',plus:'<path d="M12 4v16M4 12h16"/>',tags:'<path d="M3 4h9l9 9-8 8-10-10z"/><circle cx="8" cy="8" r="1"/>',home:'<path d="m3 10 9-7 9 7v10h-6v-6H9v6H3z"/>',settings:'<path d="M12 2.5 14 4l2.5-.5 1 2.4 2.5 1 .1 2.7 1.9 1.9-1.9 2 .1 2.7-2.5 1-1 2.4-2.5-.5-2 1.5-2-1.5-2.5.5-1-2.4-2.5-1-.1-2.7-1.9-2 1.9-1.9.1-2.7 2.5-1 1-2.4L10 4z"/><circle cx="12" cy="12" r="3"/>',phone:'<path d="M6 3 3 6c0 8 7 15 15 15l3-3-5-4-3 3c-3-1-5-3-6-6l3-3z"/>',message:'<path d="M21 11a8 8 0 0 1-8 8H5l-3 3v-9a9 9 0 1 1 19-2z"/>',chevron:'<path d="m9 5 7 7-7 7"/>',back:'<path d="m15 5-7 7 7 7"/>',trash:'<path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/>',check:'<path d="m4 12 5 5L20 6"/>',delete:'<path d="m9 9 6 6m0-6-6 6M9 4H21v16H9L2 12z"/>',share:'<circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><path d="m8 11 8-5M8 13l8 5"/>',pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4z"/>',archive:'<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v12h14V8M10 12h4"/>',mail:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="m3 6 9 7 9-7"/>'};
 const svg=n=>`<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[n]}</svg>`;
 const $=s=>document.querySelector(s);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const STORE='simple-contacts-v1';const load=()=>{try{return JSON.parse(localStorage.getItem(STORE))}catch{return null}};let db=load()||{contacts:[],myCard:{name:'',phone:'',email:'',company:''},sort:'first'};let shareSource='detail',shareFields={phone:true,email:true,company:true,address:false,notes:false};let bulkMode=false,bulkSelected=new Set(),bulkPanel='',bulkArchiveView=false;let tagPanel=false;let view='contacts',previous='contacts',current=null,step=1,addPhone='',addName='',addTags=[],filterTag='',search='',edit=false,expanded=false,tagText='',toastTimer;
-function persist(){if(localStorage.getItem('contacts-v38-signed-out')==='yes')return;localStorage.setItem(STORE,JSON.stringify(db));if(typeof syncSchedule==='function')syncSchedule()}function flash(t){document.querySelector('.toast')?.remove();let e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.remove(),2100)}
+// IndexedDB is the canonical store. Legacy localStorage is read once for migration.
+const STORE='simple-contacts-v1',IDB_NAME='contacts-app-data-v392',IDB_TABLE='snapshots';
+const load=()=>{try{return JSON.parse(localStorage.getItem(STORE))}catch{return null}};
+let db={contacts:[],myCard:{name:'',phone:'',email:'',company:''},sort:'first'};
+let storageReady=false,storageFailure=null,storageQueue=Promise.resolve(),idbHandle=null;
+function openContactStore(){
+ if(idbHandle)return idbHandle;
+ idbHandle=new Promise((resolve,reject)=>{if(!window.indexedDB)return reject(Error('IndexedDB unavailable'));
+  const req=indexedDB.open(IDB_NAME,1);
+  req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(IDB_TABLE))req.result.createObjectStore(IDB_TABLE)};
+  req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||Error('Database unavailable'));
+ });return idbHandle;
+}
+async function idbRead(key){const database=await openContactStore();return new Promise((resolve,reject)=>{
+ const tx=database.transaction(IDB_TABLE,'readonly'),req=tx.objectStore(IDB_TABLE).get(key);
+ req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||Error('Read failed'));
+ });}
+async function idbWrite(key,value){const database=await openContactStore();return new Promise((resolve,reject)=>{
+ const tx=database.transaction(IDB_TABLE,'readwrite');tx.objectStore(IDB_TABLE).put(value,key);
+ tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error||Error('Write failed'));tx.onabort=()=>reject(tx.error||Error('Write aborted'));
+ });}
+async function idbDelete(key){const database=await openContactStore();return new Promise((resolve,reject)=>{
+ const tx=database.transaction(IDB_TABLE,'readwrite');tx.objectStore(IDB_TABLE).delete(key);
+ tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error||Error('Delete failed'));tx.onabort=()=>reject(tx.error||Error('Delete aborted'));
+ });}
+function enqueueStorage(task){const pending=storageQueue.then(task);storageQueue=pending.catch(()=>{});return pending;}
+async function replaceContacts(next){
+ if(!storageReady)throw Error('Contact storage is not ready');
+ const snapshot=structuredClone(next);await enqueueStorage(()=>idbWrite('main',snapshot));db=next;
+ try{localStorage.removeItem(STORE)}catch(e){}return true;
+}
+async function initializeStorage(){
+ if(localStorage.getItem('contacts-v38-signed-out')==='yes'){
+  // A signed-out device must never load a retained local contact snapshot.
+  await idbDelete('main');db={contacts:[],myCard:{name:'',phone:'',email:'',company:''},sort:'first'};storageReady=true;return;
+ }
+ const saved=await idbRead('main');
+ if(saved&&Array.isArray(saved.contacts)){db=saved;try{localStorage.removeItem(STORE)}catch(e){}}
+ else {const legacy=load();if(legacy&&Array.isArray(legacy.contacts)){
+   await idbWrite('main',structuredClone(legacy));const verify=await idbRead('main');
+   if(!verify||stableCloudJSON(verify)!==stableCloudJSON(legacy))throw Error('Contact migration could not be verified');
+   db=verify;localStorage.removeItem(STORE);
+  }else{await idbWrite('main',structuredClone(db));}
+ }
+ // Move old safety snapshots out of the small localStorage quota as well.
+ for(const key of ['contacts-pre-vcf-import-backup','contacts-pre-cloud-restore-backup','contacts-pre-auto-sync-backup']){
+  const old=localStorage.getItem(key);if(!old)continue;
+  try{const parsed=JSON.parse(old);await idbWrite('legacy-'+key,parsed);
+   if(stableCloudJSON(await idbRead('legacy-'+key))===stableCloudJSON(parsed))localStorage.removeItem(key);
+  }catch(e){console.warn('Could not migrate a legacy recovery copy',e)}
+ }
+ storageReady=true;
+}
+let shareSource='detail',shareFields={phone:true,email:true,company:true,address:false,notes:false};let bulkMode=false,bulkSelected=new Set(),bulkPanel='',bulkArchiveView=false;let tagPanel=false;let view='contacts',previous='contacts',current=null,step=1,addPhone='',addName='',addTags=[],filterTag='',search='',edit=false,expanded=false,tagText='',toastTimer;
+function persist(){
+ if(localStorage.getItem('contacts-v38-signed-out')==='yes'||!storageReady)return Promise.resolve();
+ const snapshot=structuredClone(db);
+ const saved=enqueueStorage(()=>idbWrite('main',snapshot));
+ saved.then(()=>{storageFailure=null;if(typeof syncSchedule==='function')syncSchedule()})
+ .catch(e=>{storageFailure=e;flash('Could not save changes. Check device storage.');syncBlocked=true;});
+ return saved;
+}function flash(t){document.querySelector('.toast')?.remove();let e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.remove(),2100)}
 function norm(n){return String(n||'').replace(/[^\d+]/g,'')}function fmt(n){let d=String(n).replace(/\D/g,'');return d.length===10?`(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`:n}function sortMode(){return ['az','za','favorites','most'].includes(db.sortMode)?db.sortMode:'az'}
 function displayName(c){let n=String(c.name||'').trim();if(db.nameOrder!=='lastFirst')return n;let parts=n.split(/\s+/);if(parts.length<2)return n;let last=(c.lastName||parts.at(-1));let first=(c.firstName||parts.slice(0,-1).join(' '));return last+', '+first}
 function alphaCompare(a,b){return String(a.name||'').localeCompare(String(b.name||''),undefined,{sensitivity:'base'})}
@@ -192,12 +252,27 @@ function displayBirthday(v){let m=String(v||'').match(/^1604[-/]?(\d{2})[-/]?(\d
 const vcUnescape=s=>String(s||'').replace(/\\n/gi,'\n').replace(/\\([,;\\])/g,'$1');
 const vcEscape=s=>String(s||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
 function vcLines(card){return card.replace(/\r\n?/g,'\n').split('\n').reduce((a,l)=>{if(/^[ \t]/.test(l)&&a.length)a[a.length-1]+=l.slice(1);else a.push(l);return a},[])}
-function vcParse(text){let chunks=text.replace(/\r\n?/g,'\n').match(/BEGIN:VCARD[\s\S]*?END:VCARD/gi)||[];return chunks.map(raw=>{let lines=vcLines(raw),items=[];for(let line of lines){let i=line.indexOf(':');if(i<0)continue;let left=line.slice(0,i),key=left.split(';')[0].split('.').at(-1).toUpperCase(),params=left.slice(left.indexOf(';')+1).toUpperCase();items.push({key,params,value:line.slice(i+1),line})}const all=k=>items.filter(x=>x.key===k),first=k=>vcUnescape(all(k)[0]?.value||'');let structured=all('N')[0]?.value.split(';').map(vcUnescape)||[],full=first('FN')||[structured[1],structured[0]].filter(Boolean).join(' ')||'Unnamed contact';let tels=all('TEL').map(x=>({value:vcUnescape(x.value).replace(/^tel:/i,''),params:x.params})),emails=all('EMAIL').map(x=>vcUnescape(x.value)),websites=all('URL').map(x=>vcUnescape(x.value)),addresses=all('ADR').map(x=>vcUnescape(x.value).split(';').filter(Boolean).join(', '));let preferred=tels.find(x=>/PREF|CELL|MOBILE|IPHONE/i.test(x.params))||tels[0];let work=tels.find(x=>/WORK/i.test(x.params)&&x!==preferred);let other=tels.find(x=>x!==preferred&&x!==work);let extras=items.filter(x=>!['BEGIN','END','VERSION','FN','N','TEL','EMAIL','ORG','BDAY','ADR','URL','NOTE'].includes(x.key)).map(x=>x.line);return {id:crypto.randomUUID?.()||String(Date.now()+Math.random()),name:full,primary:preferred?.value||'',work:work?.value||'',other:other?.value||'',email:emails[0]||'',company:first('ORG').split(';')[0],birthday:normalizeBirthday(first('BDAY')),address:addresses[0]||'',website:websites[0]||'',notes:first('NOTE'),tags:[],favorite:false,vcfRaw:raw.replace(/\n/g,'\r\n'),vcfOriginal:{name:full,primary:preferred?.value||'',work:work?.value||'',other:other?.value||'',email:emails[0]||'',company:first('ORG').split(';')[0],birthday:normalizeBirthday(first('BDAY')),address:addresses[0]||'',website:websites[0]||'',notes:first('NOTE')},vcfExtra:extras,vcfCounts:{phones:tels.length,emails:emails.length,addresses:addresses.length,websites:websites.length,photos:all('PHOTO').length},vcfStructuredName:structured}})}
+function vcParse(text){let chunks=text.replace(/\r\n?/g,'\n').match(/BEGIN:VCARD[\s\S]*?END:VCARD/gi)||[];return chunks.map(raw=>{let lines=vcLines(raw),items=[];for(let line of lines){let i=line.indexOf(':');if(i<0)continue;let left=line.slice(0,i),key=left.split(';')[0].split('.').at(-1).toUpperCase(),params=left.slice(left.indexOf(';')+1).toUpperCase();items.push({key,params,value:line.slice(i+1),line})}const all=k=>items.filter(x=>x.key===k),first=k=>vcUnescape(all(k)[0]?.value||'');let structured=all('N')[0]?.value.split(';').map(vcUnescape)||[],full=first('FN')||[structured[1],structured[0]].filter(Boolean).join(' ')||'Unnamed contact';let tels=all('TEL').map(x=>({value:vcUnescape(x.value).replace(/^tel:/i,''),params:x.params})),emails=all('EMAIL').map(x=>vcUnescape(x.value)),websites=all('URL').map(x=>vcUnescape(x.value)),addresses=all('ADR').map(x=>vcUnescape(x.value).split(';').filter(Boolean).join(', '));let preferred=tels.find(x=>/PREF|CELL|MOBILE|IPHONE/i.test(x.params))||tels[0];let work=tels.find(x=>/WORK/i.test(x.params)&&x!==preferred);let other=tels.find(x=>x!==preferred&&x!==work);let extras=items.filter(x=>!['BEGIN','END','VERSION','FN','N','TEL','EMAIL','ORG','BDAY','ADR','URL','NOTE'].includes(x.key)).filter(x=>x.key!=='PHOTO').map(x=>x.line);return {id:crypto.randomUUID?.()||String(Date.now()+Math.random()),name:full,primary:preferred?.value||'',work:work?.value||'',other:other?.value||'',email:emails[0]||'',company:first('ORG').split(';')[0],birthday:normalizeBirthday(first('BDAY')),address:addresses[0]||'',website:websites[0]||'',notes:first('NOTE'),tags:[],favorite:false,vcfRaw:raw.replace(/\n/g,'\r\n'),vcfOriginal:{name:full,primary:preferred?.value||'',work:work?.value||'',other:other?.value||'',email:emails[0]||'',company:first('ORG').split(';')[0],birthday:normalizeBirthday(first('BDAY')),address:addresses[0]||'',website:websites[0]||'',notes:first('NOTE')},vcfExtra:extras,vcfCounts:{phones:tels.length,emails:emails.length,addresses:addresses.length,websites:websites.length,photos:all('PHOTO').length},vcfStructuredName:structured}})}
 function vcPhoneKeys(c){return [c.primary,c.work,c.other].filter(Boolean).map(x=>norm(x).replace(/^\+/,''))}
 function vcDuplicate(a,b){let ap=vcPhoneKeys(a),bp=vcPhoneKeys(b);if(ap.some(x=>x.length>=7&&bp.includes(x)))return true;let ae=String(a.email||'').trim().toLowerCase(),be=String(b.email||'').trim().toLowerCase();return !!(ae&&be&&ae===be)}
 function vcExport(c){let original=c.vcfRaw;if(original){let orig=c.vcfOriginal||{};let same=['name','primary','work','other','email','company','birthday','address','website','notes'].every(k=>String(c[k]||'')===String(orig[k]||''));if(same)return original;let lines=vcLines(original);let changes=[['FN','name'],['TEL','primary'],['EMAIL','email'],['ORG','company'],['BDAY','birthday'],['ADR','address'],['URL','website'],['NOTE','notes']];for(let [prop,key] of changes){if(String(c[key]||'')===String(orig[key]||''))continue;let index=lines.findIndex(l=>new RegExp('^(?:[^.:]+\\.)?'+prop+'(?:;[^:]*)?:','i').test(l));let val=prop==='ADR'?'':vcEscape(c[key]||'');if(prop==='ADR'&&c[key])val=';;'+vcEscape(c[key])+';;;;';if(index>=0){if(c[key])lines[index]=lines[index].slice(0,lines[index].indexOf(':')+1)+val;else lines.splice(index,1)}else if(c[key])lines.splice(lines.findIndex(l=>/^END:VCARD/i.test(l)),0,prop+':'+val)}if(String(c.work||'')!==String(orig.work||'')&&c.work)lines.splice(lines.findIndex(l=>/^END:VCARD/i.test(l)),0,'TEL;TYPE=WORK:'+vcEscape(c.work));if(String(c.other||'')!==String(orig.other||'')&&c.other)lines.splice(lines.findIndex(l=>/^END:VCARD/i.test(l)),0,'TEL;TYPE=OTHER:'+vcEscape(c.other));return lines.join('\r\n')}let n=c.name.trim().split(/\s+/),family=n.length>1?n.pop():'';return ['BEGIN:VCARD','VERSION:3.0','N:'+vcEscape(family)+';'+vcEscape(n.join(' '))+';;;','FN:'+vcEscape(c.name),...[['TEL;TYPE=CELL',c.primary],['TEL;TYPE=WORK',c.work],['TEL;TYPE=OTHER',c.other],['EMAIL',c.email],['ORG',c.company],['BDAY',c.birthday],['URL',c.website],['NOTE',c.notes]].filter(x=>x[1]).map(([k,v])=>k+':'+vcEscape(v)),...(c.address?['ADR:;;'+vcEscape(c.address)+';;;;']:[]),'END:VCARD'].join('\r\n')}
 function vcDownload(contents,name,type){let blob=new Blob([contents],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
-function vcImportReview(file){file.text().then(t=>{let incoming=vcParse(t);if(!incoming.length){flash('No valid vCards found');return}let unique=[],dupes=[],within=[];for(let c of incoming){if(db.contacts.some(e=>vcDuplicate(c,e)))dupes.push(c);else if(unique.some(e=>vcDuplicate(c,e)))within.push(c);else unique.push(c)}let withExtras=incoming.filter(c=>Object.values(c.vcfCounts).some(n=>n>1)||c.vcfExtra.length).length;let summary=`${incoming.length} contact${incoming.length===1?'':'s'} found\n\n${unique.length} new contacts\n${dupes.length} already in your app\n${within.length} repeated in the file\n${withExtras} with additional Apple fields preserved\n\nImport ${unique.length} new contacts? Existing contacts will not be changed.`;if(!confirm(summary))return;try{let before=JSON.stringify(db);localStorage.setItem('contacts-pre-vcf-import-backup',before);db.contacts.push(...unique);persist();search='';filterTag='';go('contacts');flash(unique.length+' contacts imported')}catch(err){flash('Storage full — no contacts imported');db=JSON.parse(localStorage.getItem(STORE)||'{}');go('settings')}}).catch(()=>flash('Unable to read file'))}
+async function vcImportReview(file){
+ try{
+  if(!storageReady)throw Error('Storage is still loading');
+  const incoming=vcParse(await file.text());if(!incoming.length){flash('No valid vCards found');return}
+  let unique=[],dupes=[],within=[];
+  for(const c of incoming){if(db.contacts.some(e=>vcDuplicate(c,e)))dupes.push(c);
+   else if(unique.some(e=>vcDuplicate(c,e)))within.push(c);else unique.push(c)}
+  const withExtras=incoming.filter(c=>Object.values(c.vcfCounts).some(n=>n>1)||c.vcfExtra.length).length;
+  const summary=`${incoming.length} contacts found\n\n${unique.length} new contacts\n${dupes.length} already in your app\n${within.length} repeated in the file\n${withExtras} with additional Apple fields preserved\n\nImport ${unique.length} new contacts? Existing contacts will not be changed.`;
+  if(!unique.length){flash('All contacts are already imported');return}
+  if(!confirm(summary))return;
+  const next={...db,contacts:[...db.contacts,...unique]};
+  // One atomic IndexedDB commit; failure leaves existing contacts untouched.
+  await replaceContacts(next);syncSchedule();search='';filterTag='';go('contacts');flash(unique.length+' contacts imported');
+ }catch(err){console.error('Import failed',err);alert('Import could not be saved. Your existing contacts were not changed. '+(err?.message||'Please check available storage.'))}
+}
 
 document.addEventListener('click',e=>{let link=e.target.closest('a[href^="tel:"],a[href^="sms:"]');if(link&&view==='detail'&&current)trackContact(current)},true);
 function settingsPage(){
@@ -222,7 +297,7 @@ async function signOutContactsAccount(){
  const {data:row,error:readError}=await client.from('contact_backups').select('backup_data').eq('user_id',user.id).maybeSingle();if(readError)throw readError;
  if(!row||stableCloudJSON(row.backup_data)!==stableCloudJSON(db))throw Error('Your cloud copy is not identical to this device. Wait for sync to finish and try again. No contacts were removed.');
  syncStop();const {error}=await client.auth.signOut();if(error)throw error;
- localStorage.setItem(LOCK_KEY,'yes');for(const key of ['contacts-pre-vcf-import-backup','contacts-pre-cloud-restore-backup','contacts-pre-auto-sync-backup'])localStorage.removeItem(key);localStorage.removeItem(STORE);db=emptyContacts();cloudAuthMode='signin';lockPage();
+ localStorage.setItem(LOCK_KEY,'yes');await enqueueStorage(()=>idbDelete('main'));for(const key of ['contacts-pre-vcf-import-backup','contacts-pre-cloud-restore-backup','contacts-pre-auto-sync-backup'])localStorage.removeItem(key);localStorage.removeItem(STORE);db=emptyContacts();cloudAuthMode='signin';lockPage();
  }catch(e){alert('Sign out was stopped to protect your contacts: '+e.message)}
 }
 function themePage(){let theme=db.theme==='light'?'light':'dark';shell(`<div class="top"><button class="back" id="back">${svg('back')} Settings</button><strong>Appearance</strong></div><div class="section">App theme</div><button class="theme-option" data-theme-option="dark"><span><strong>Dark</strong><span class="theme-description">Original Indigo Dark theme</span></span>${theme==='dark'?svg('check'):''}</button><button class="theme-option" data-theme-option="light"><span><strong>Light</strong><span class="theme-description">Clean, bright cards and soft blue accents</span></span>${theme==='light'?svg('check'):''}</button><p class="hint">Your choice is saved on this device. It does not change contacts or other settings.</p>`);$('#back').onclick=()=>go('settings');document.querySelectorAll('[data-theme-option]').forEach(b=>b.onclick=()=>{db.theme=b.dataset.themeOption;persist();applyTheme();render()})}
@@ -249,7 +324,7 @@ function syncNotice(msg){let el=$('#sync-status');if(el)el.textContent=msg}
 async function syncTick(){
  if(!syncEnabled()||syncRunning||cloudBusy||syncBlocked||!navigator.onLine)return;
  syncRunning=true;
- try{
+ try{await storageQueue;if(storageFailure)throw storageFailure;
   const client=cloudApi(),{data:{user},error:authError}=await client.auth.getUser();
   if(authError||!user){syncStop();return}
   if(syncOwner&&syncOwner!==user.id){syncStop();return}
@@ -265,9 +340,7 @@ async function syncTick(){
    syncBlocked=true;syncNotice('Sync paused: both devices changed. Your data is safe; resolve the conflict manually.');return;
   }
   if(cloudHash!==syncBaseline){
-   const before=JSON.stringify(db);
-   localStorage.setItem('contacts-pre-auto-sync-backup',before);
-   localStorage.setItem(STORE,JSON.stringify(row.backup_data));db=row.backup_data;
+   await replaceContacts(row.backup_data);
    syncBaseline=cloudHash;syncStamp();applyTheme();
    if(view!=='add'&&!edit&&view!=='share')render();
    syncNotice('Updated from cloud');return;
@@ -301,7 +374,7 @@ setInterval(()=>{if(syncEnabled())syncTick()},20000);
 window.addEventListener('online',()=>syncTick());
 window.addEventListener('focus',()=>syncTick());
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncTick()});
-window.addEventListener('storage',e=>{if(e.key===STORE){const fresh=load();if(fresh&&Array.isArray(fresh.contacts)){db=fresh;syncSchedule();if(view==='contacts'||view==='favorites')render()}}});
+
 function cloudApi(){if(!cloudClient){if(!window.supabase?.createClient)throw Error('Cloud library did not load. Check your internet connection.');cloudClient=window.supabase.createClient(CLOUD_URL,CLOUD_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}return cloudClient}
 function stableCloudJSON(v){if(Array.isArray(v))return '['+v.map(stableCloudJSON).join(',')+']';if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+stableCloudJSON(v[k])).join(',')+'}';return JSON.stringify(v)}
 function cloudMessage(message,isError=false){let e=$('#cloud-message');if(e){e.textContent=message;e.style.color=isError?'#ff8f8f':''}}
@@ -343,22 +416,22 @@ async function unlockFromCloud(){
  const client=cloudApi(),{data:{user}}=await client.auth.getUser();if(!user)throw Error('Sign in required');
  const {data:row,error}=await client.from('contact_backups').select('backup_data').eq('user_id',user.id).maybeSingle();if(error)throw error;
  if(!row||!Array.isArray(row.backup_data?.contacts))throw Error('No cloud contacts found. Please contact support; this device remains locked.');
- const incoming=row.backup_data;localStorage.setItem(STORE,JSON.stringify(incoming));db=incoming;localStorage.removeItem(LOCK_KEY);applyTheme();view='contacts';render();await syncEnable();flash('Signed in — contacts restored');
+ const incoming=row.backup_data;await replaceContacts(incoming);localStorage.removeItem(LOCK_KEY);applyTheme();view='contacts';render();await syncEnable();flash('Signed in — contacts restored');
 }
 async function autoSetupSync(){
  try{if(syncEnabled())return;const client=cloudApi(),{data:{user}}=await client.auth.getUser();if(!user)return;
  const {data:row,error}=await client.from('contact_backups').select('backup_data').eq('user_id',user.id).maybeSingle();if(error)return;
  if(!row){if(db.contacts.length)await cloudFirstSetup();else{const {error:e}=await client.from('contact_backups').upsert({user_id:user.id,backup_data:db,updated_at:new Date().toISOString()});if(!e)await syncEnable()}}
  else if(stableCloudJSON(row.backup_data)===stableCloudJSON(db))await syncEnable();
- else if(db.contacts.length===0&&Array.isArray(row.backup_data?.contacts)){localStorage.setItem(STORE,JSON.stringify(row.backup_data));db=row.backup_data;await syncEnable();if(view!=='cloud')render()}
+ else if(db.contacts.length===0&&Array.isArray(row.backup_data?.contacts)){await replaceContacts(row.backup_data);await syncEnable();if(view!=='cloud')render()}
  else cloudMessage('This device has different contacts. Review safe sync options before continuing.',true);
  }catch(e){cloudMessage('Sync setup needs attention: '+e.message,true)}
 }
 async function cloudFirstSetup(){if(!db.contacts.length)return;let client=cloudApi();let {data:{user}}=await client.auth.getUser();if(!user)return cloudMessage('Sign in first.',true);let {data:existing,error}=await client.from('contact_backups').select('backup_data').eq('user_id',user.id).maybeSingle();if(error)return cloudMessage(error.message,true);if(existing)return cloudRefresh();await cloudUpload();let {data:check}=await client.from('contact_backups').select('backup_data').eq('user_id',user.id).maybeSingle();if(check&&stableCloudJSON(check.backup_data)===stableCloudJSON(db))await syncEnable()}
 async function cloudRestoreAndSync(){if(!confirm('Restore cloud contacts to this device and enable automatic sync? A copy of your current local data will be saved before restoring.'))return;await cloudRestore(true);let client=cloudApi(),{data:{user}}=await client.auth.getUser();if(!user)return;let {data}=await client.from('contact_backups').select('backup_data').eq('user_id',user.id).maybeSingle();if(data&&stableCloudJSON(data.backup_data)===stableCloudJSON(db))await syncEnable()}
 async function cloudUpload(){if(cloudBusy)return;if(syncEnabled()){cloudMessage('Turn off automatic sync before using manual backup.',true);return}if(!confirm('Back up '+db.contacts.length+' contacts to the cloud? This replaces any existing cloud backup.'))return;cloudBusy=true;try{let client=cloudApi(),{data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw authError||Error('Please sign in');let snapshot=JSON.parse(JSON.stringify(db));let {error}=await client.from('contact_backups').upsert({user_id:user.id,backup_data:snapshot,updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;let {data:verify,error:verifyError}=await client.from('contact_backups').select('backup_data,updated_at').eq('user_id',user.id).single();if(verifyError||!verify||stableCloudJSON(verify.backup_data)!==stableCloudJSON(snapshot))throw Error('Upload could not be verified. Please try again.');cloudMessage('Backup verified: '+snapshot.contacts.length+' contacts saved to cloud.');await cloudRefresh();cloudMessage('Backup verified: '+snapshot.contacts.length+' contacts saved to cloud.')}catch(e){cloudMessage('Backup not verified: '+e.message,true)}finally{cloudBusy=false}}
-async function cloudRestore(skipConfirm=false){if(cloudBusy)return;if(syncEnabled()){cloudMessage('Turn off automatic sync before manually restoring.',true);return}cloudBusy=true;try{let client=cloudApi(),{data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw authError||Error('Please sign in');let {data,error}=await client.from('contact_backups').select('backup_data').eq('user_id',user.id).single();if(error)throw error;let incoming=data?.backup_data;if(!incoming||!Array.isArray(incoming.contacts))throw Error('Cloud backup has no valid contacts array');if(!skipConfirm&&!confirm('Restore '+incoming.contacts.length+' cloud contacts? This REPLACES '+db.contacts.length+' contacts currently on this device. Export a JSON backup first.'))return;let before=JSON.stringify(db);try{localStorage.setItem('contacts-pre-cloud-restore-backup',before);localStorage.setItem(STORE,JSON.stringify(incoming));db=incoming;applyTheme();cloudPage();cloudMessage('Restored '+db.contacts.length+' contacts. A local pre-restore copy was saved.')}catch(e){localStorage.setItem(STORE,before);db=JSON.parse(before);throw e}}catch(e){cloudMessage('Restore failed: '+e.message,true)}finally{cloudBusy=false}}
+async function cloudRestore(skipConfirm=false){if(cloudBusy)return;if(syncEnabled()){cloudMessage('Turn off automatic sync before manually restoring.',true);return}cloudBusy=true;try{let client=cloudApi(),{data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw authError||Error('Please sign in');let {data,error}=await client.from('contact_backups').select('backup_data').eq('user_id',user.id).single();if(error)throw error;let incoming=data?.backup_data;if(!incoming||!Array.isArray(incoming.contacts))throw Error('Cloud backup has no valid contacts array');if(!skipConfirm&&!confirm('Restore '+incoming.contacts.length+' cloud contacts? This REPLACES '+db.contacts.length+' contacts currently on this device. Export a JSON backup first.'))return;await replaceContacts(incoming);applyTheme();cloudPage();cloudMessage('Restored '+db.contacts.length+' contacts.');}catch(e){cloudMessage('Restore failed: '+e.message,true)}finally{cloudBusy=false}}
 
 function applyTheme(){let light=db.theme==='light';document.documentElement.setAttribute('data-theme',light?'light':'dark');document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#f3f6fb':'#0b1428');document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',light?'light':'dark');document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')?.setAttribute('content',light?'default':'black')}
-function render(){if(localStorage.getItem(LOCK_KEY)==='yes'){lockPage();return}if(['contacts','favorites','search'].includes(view))listPage();else if(view==='add')addPage();else if(view==='detail')detailPage();else if(view==='tags')tagsPage();else if(view==='settings')settingsPage();else if(view==='sort')sortPage();else if(view==='mycard')myCardPage();else if(view==='share')sharePage();else if(view==='cloud')cloudPage();else if(view==='transfer')transferPage();else if(view==='account')accountPage()};applyTheme();render();if(syncEnabled())setTimeout(syncTick,2200);else if(localStorage.getItem(LOCK_KEY)!=='yes')setTimeout(autoSetupSync,2600);
+function render(){if(localStorage.getItem(LOCK_KEY)==='yes'){lockPage();return}if(['contacts','favorites','search'].includes(view))listPage();else if(view==='add')addPage();else if(view==='detail')detailPage();else if(view==='tags')tagsPage();else if(view==='settings')settingsPage();else if(view==='sort')sortPage();else if(view==='mycard')myCardPage();else if(view==='share')sharePage();else if(view==='cloud')cloudPage();else if(view==='transfer')transferPage();else if(view==='account')accountPage()};(async()=>{try{await initializeStorage();applyTheme();render();if(syncEnabled())setTimeout(syncTick,2200);else if(localStorage.getItem(LOCK_KEY)!=='yes')setTimeout(autoSetupSync,2600)}catch(e){storageFailure=e;document.querySelector('#app').innerHTML='<main class="main" style="padding:28px"><h2>Unable to open contact storage</h2><p>Your contacts have not been deleted. Please do not clear browser data or uninstall the app.</p><p>Try reopening the app. If this continues, contact support.</p></main>';console.error(e)}})();
 </script></body></html>
