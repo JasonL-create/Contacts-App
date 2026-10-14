@@ -161,7 +161,7 @@ html[data-theme="light"] .bulk-footer{background:#f3f6fb}html[data-theme="light"
 .tag-message-row{display:flex;align-items:stretch;gap:6px}.tag-message-row .setting{flex:1;min-width:0}.tag-message-btn{flex:0 0 52px;border:1px solid #344764;border-radius:12px;background:#172944;color:#9fc6ff;display:flex;align-items:center;justify-content:center;margin:3px 0}.tag-message-btn .icon{width:21px;height:21px}
 .group-message-overlay{position:fixed;inset:0;background:#000b;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px}
 .group-message-card{background:#14223a;color:#f4f7fc;border:1px solid #435a79;border-radius:18px;padding:20px;width:min(420px,100%);max-height:85vh;overflow:auto;box-shadow:0 20px 70px #0008}
-.group-message-card h2{margin:0 0 6px}.group-message-card .ghost{margin-top:8px}
+.group-message-card h2{margin:0 0 6px}.group-message-card .ghost{margin-top:12px}.group-message-card .group-message-cancel{display:block;width:100%;text-align:center;padding:14px 8px;border:0;background:transparent}
 .group-message-recipients{max-height:30vh;overflow:auto;border-top:1px solid #344764;border-bottom:1px solid #344764;margin:12px 0;padding:5px 0}
 .group-message-recipients>div{display:flex;justify-content:space-between;gap:12px;padding:9px 2px;font-size:13px}.group-message-recipients span{color:#b8c7d9}
 #app-update-banner{position:fixed;z-index:9000;top:env(safe-area-inset-top,0px);left:12px;right:12px;max-width:480px;margin:8px auto;padding:10px 12px;border-radius:12px;background:#243b5e;color:white;border:1px solid #6686b6;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 5px 20px #0007}
@@ -277,24 +277,30 @@ function openGroupMessage(contacts){
  <p class="muted small">${people.length} unique phone number${people.length===1?'':'s'} ready${missing.length?` · ${missing.length} without phone numbers`:''}</p>
  <div class="group-message-recipients">${people.map(x=>`<div><strong>${esc(x.name)}</strong><span>${esc(fmt(x.phone))}</span></div>`).join('')||'<p>No phone numbers found.</p>'}</div>
  ${missing.length?`<p class="muted small">Skipped: ${esc(missing.join(', '))}</p>`:''}
- <p class="muted small">Apple Messages may not accept multiple recipients from a web app. Verify the recipients before sending.</p>
- <button class="action full" id="group-message-open" ${!people.length?'disabled':''}>Open Messages</button>
- <button class="ghost full" id="group-message-copy" ${!people.length?'disabled':''}>Copy Phone Numbers</button>
- <button class="ghost full" id="group-message-cancel">Cancel</button></div>`;
+ <p class="muted small">Copy the recipients, then paste them into the <strong>To:</strong> field in Messages. Check everyone before sending.</p>
+ <button class="action full" id="group-message-open" ${!people.length?'disabled':''}>Copy Numbers &amp; Open Messages</button>
+ <button class="ghost full group-message-cancel" id="group-message-cancel">Cancel</button></div>`;
  document.body.appendChild(layer);
  const close=()=>layer.remove();
  layer.addEventListener('click',e=>{if(e.target===layer)close()});
  layer.querySelector('#group-message-cancel').onclick=close;
  const numbers=people.map(x=>x.phone);
- layer.querySelector('#group-message-open').onclick=()=>{
-   // Use a comma-separated recipient list; iOS behavior varies across versions.
-   const url='sms:'+numbers.map(encodeURIComponent).join(',');
-   window.location.href=url;
+ layer.querySelector('#group-message-open').onclick=async()=>{
+   const text=numbers.join(', ');
+   let copied=false;
+   try{await navigator.clipboard.writeText(text);copied=true}catch(e){
+     const t=document.createElement('textarea');t.value=text;
+     t.style.cssText='position:fixed;left:10px;top:10px;z-index:99999';
+     document.body.appendChild(t);t.focus();t.select();
+     try{copied=document.execCommand('copy')}catch(_){}t.remove();
+   }
+   if(!copied){flash('Could not copy numbers. Please try again.');return}
+   close();
+   // No recipient in the URL: iOS should show a new blank composition if supported.
+   // If iOS does not open it, the numbers are still on the clipboard.
+   window.location.href='sms:';
  };
- layer.querySelector('#group-message-copy').onclick=async()=>{
-   try{await navigator.clipboard.writeText(numbers.join(', '));flash('Phone numbers copied');close()}
-   catch(e){const t=document.createElement('textarea');t.value=numbers.join(', ');t.style.cssText='position:fixed;left:10px;top:10px;z-index:99999';document.body.appendChild(t);t.select();try{document.execCommand('copy');flash('Phone numbers copied');close()}catch(_){flash('Unable to copy numbers')}t.remove()}
- };
+
 }
 function tagsPage(){let tags=allTags();shell(`<div class="top"><h1>Tags</h1><span class="muted small">${tags.length} tags</span></div>${tags.map(t=>`<div class="tag-message-row"><button class="setting" data-tag="${esc(t)}"><span>${esc(t)}</span><span class="muted small">${db.contacts.filter(c=>!c.archived&&c.tags?.includes(t)).length} ${svg('chevron')}</span></button><button class="tag-message-btn" data-message-tag="${esc(t)}" aria-label="Group message ${esc(t)}" title="Group message ${esc(t)}">${svg('message')}</button></div>`).join('')||'<p class="empty">Tags appear here when added to contacts.</p>'}`);document.querySelectorAll('[data-tag]').forEach(b=>b.onclick=()=>{filterTag=b.dataset.tag;search='';go('contacts')});document.querySelectorAll('[data-message-tag]').forEach(b=>b.onclick=()=>openGroupMessage(db.contacts.filter(c=>!c.archived&&c.tags?.includes(b.dataset.messageTag))))}
 function normalizeBirthday(v){v=String(v||'').trim();if(!v)return '';let m=v.match(/^--(\d{2})-?(\d{2})$/);if(m)return m[1]+'/'+m[2];m=v.match(/^(\d{4})-?(\d{2})-?(\d{2})$/);if(m)return (+m[1]<=1604?'':m[1]+'/')+m[2]+'/'+m[3];return v}
@@ -353,7 +359,7 @@ function homePage(){const dates=dateEntries(),duplicates=cleanupMatches();const 
 function stayPage(){shell(`<div class="top"><button class="back" id="back">${svg('back')} Home</button><strong>Stay Connected</strong></div><section class="home-panel"><h2>Gentle reminders</h2><p class="hint">Only contacts you explicitly choose are included. This does not read your phone calls or messages.</p><label class="setting">Enable reminders <input type="checkbox" id="stay-enabled" ${db.stayConnectedEnabled?'checked':''}></label><label class="setting">Remind after <select class="field" id="stay-days" style="max-width:120px">${[7,14,30,60,90].map(n=>`<option value="${n}" ${Number(db.stayConnectedDays||30)===n?'selected':''}>${n} days</option>`).join('')}</select></label><p class="hint">Enable reminders for individual people from their contact cards.</p></section>`);$('#back').onclick=()=>go('home');$('#stay-enabled').onchange=e=>{db.stayConnectedEnabled=e.target.checked;persist()};$('#stay-days').onchange=e=>{db.stayConnectedDays=Number(e.target.value);persist()}}
 function cleanupPage(){const pairs=cleanupMatches();shell(`<div class="top"><button class="back" id="back">${svg('back')} Home</button><strong>Contact Cleanup</strong></div><p class="hint">Same-name contacts may be different people. Review them before making changes; this screen never deletes or merges automatically.</p>${pairs.length?pairs.map(([a,b])=>`<div class="home-panel"><strong>${esc(a.name)}</strong><p class="hint">${esc(a.primary||a.email||'No phone number')} · ${esc(b.primary||b.email||'No phone number')}</p><button class="action secondary" data-compare="${esc(a.id)}">View first contact</button> <button class="ghost" data-compare="${esc(b.id)}">View second</button></div>`).join(''):'<p class="empty">No possible duplicate names found.</p>'}`);$('#back').onclick=()=>go('home');document.querySelectorAll('[data-compare]').forEach(b=>b.onclick=()=>{current=b.dataset.compare;previous='cleanup';go('detail')})}
 function settingsPage(){
- shell(`<div class="top"><h1>Settings</h1></div><div class="settings-group"><button class="setting" data-setting="cloud"><span>☁ &nbsp; Cloud Sync <small class="settings-sub">Your contacts stay updated automatically</small></span>${svg('chevron')}</button></div><div class="settings-group">${[['mycard','My Card'],['sort','Appearance & Sorting'],['transfer','Import & Export'],['account','Security & Account']].map(([k,t])=>`<button class="setting" data-setting="${k}"><span>${t}</span>${svg('chevron')}</button>`).join('')}</div><p class="hint settings-version">Contacts · v4.1.0</p>`);
+ shell(`<div class="top"><h1>Settings</h1></div><div class="settings-group"><button class="setting" data-setting="cloud"><span>☁ &nbsp; Cloud Sync <small class="settings-sub">Your contacts stay updated automatically</small></span>${svg('chevron')}</button></div><div class="settings-group">${[['mycard','My Card'],['sort','Appearance & Sorting'],['transfer','Import & Export'],['account','Security & Account']].map(([k,t])=>`<button class="setting" data-setting="${k}"><span>${t}</span>${svg('chevron')}</button>`).join('')}</div><p class="hint settings-version">Contacts · v4.1.1</p>`);
  document.querySelectorAll('[data-setting]').forEach(b=>b.onclick=()=>{const k=b.dataset.setting;go(k==='sort'?'sort':k)});
 }
 function transferPage(){shell(`<div class="top"><button class="back" id="back">${svg('back')} Settings</button><strong>Import & Export</strong></div>${[['export','Export JSON backup'],['vcfexport','Export Apple contacts (.vcf)'],['import','Import contacts (.vcf or .json)']].map(([k,t])=>`<button class="setting" data-transfer="${k}"><span>${t}</span>${svg('chevron')}</button>`).join('')}<section id="import-guide" class="import-guide" hidden><h2>Import contacts</h2><p class="hint">In Apple Contacts, open Lists, touch and hold All Contacts, choose Export, and save the .vcf file to Files. Then choose it below. Existing vCard contacts won't be overwritten.</p><button class="action full" id="choose-import-file">Choose Contacts File</button></section><input id="import-file" type="file" accept=".vcf,.vcard,.json,text/vcard,application/json" hidden>`);
@@ -511,7 +517,7 @@ async function cloudRestore(skipConfirm=false){if(cloudBusy)return;if(syncEnable
 
 function applyTheme(){let light=db.theme==='light';document.documentElement.setAttribute('data-theme',light?'light':'dark');document.querySelector('meta[name="theme-color"]')?.setAttribute('content',light?'#f3f6fb':'#0b1428');document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',light?'light':'dark');document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')?.setAttribute('content',light?'default':'black')}
 function render(){if(localStorage.getItem(LOCK_KEY)==='yes'){lockPage();return}if(['contacts','favorites','search'].includes(view))listPage();else if(view==='add')addPage();else if(view==='detail')detailPage();else if(view==='tags')tagsPage();else if(view==='settings')settingsPage();else if(view==='sort')sortPage();else if(view==='mycard')myCardPage();else if(view==='share')sharePage();else if(view==='cloud')cloudPage();else if(view==='transfer')transferPage();else if(view==='account')accountPage();else if(view==='home')homePage();else if(view==='stay')stayPage();else if(view==='cleanup')cleanupPage()};
-const CONTACTS_APP_BUILD='4.1.0';
+const CONTACTS_APP_BUILD='4.1.1';
 let updateLastChecked=0;
 function versionParts(v){return String(v).split('.').map(x=>parseInt(x,10)||0)}
 function isNewerBuild(a,b){let x=versionParts(a),y=versionParts(b);for(let i=0;i<3;i++){if((x[i]||0)!==(y[i]||0))return (x[i]||0)>(y[i]||0)}return false}
